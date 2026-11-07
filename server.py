@@ -212,6 +212,52 @@ class GreeterServicer(greeter_pb2_grpc.GreeterServicer):
             message_count
         )
 
+        # Bidirectional Streaming: поток запросов <-> поток ответов
+        def ChatGreetings(self, request_iterator, context):
+
+            message_count = 0
+
+            logging.info("ChatGreetings started")
+
+            for request in request_iterator:
+
+                # Проверяем, не отключился ли клиент
+                if not context.is_active():
+                    logging.info("ChatGreetings: client disconnected")
+                    return
+
+                # Ограничиваем количество входящих сообщений
+                if message_count >= MAX_STREAM_MESSAGES:
+                    context.abort(
+                        grpc.StatusCode.RESOURCE_EXHAUSTED,
+                        f"Maximum {MAX_STREAM_MESSAGES} messages allowed"
+                    )
+
+                message_count += 1
+
+                # Валидируем входящие данные
+                name = self.validate_name(request.name, context)
+
+                # Формируем приветствие
+                greeting = self.build_greeting(name, request.tags)
+
+                logging.info(
+                    "ChatGreetings message #%s: name=%s",
+                    message_count,
+                    name
+                )
+
+                # Отправляем ответ на каждое входящее сообщение
+                yield greeter_pb2.HelloReply(
+                    message=f"Message {message_count}: {greeting}",
+                    timestamp=int(time.time())
+                )
+
+            logging.info(
+                "ChatGreetings finished: messages=%s",
+                message_count
+            )
+
 
 
 def serve():
