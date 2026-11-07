@@ -1,10 +1,21 @@
+
 syntax = "proto3";
 
 package bugdays.demo;
 
 service Greeter {
+
+  // Unary: один запрос -> один ответ
   rpc SayHello (HelloRequest) returns (HelloReply);
+
+  // Server Streaming: один запрос -> поток ответов
   rpc WatchGreetings (HelloRequest) returns (stream HelloReply);
+
+  // Client Streaming: поток запросов -> один ответ
+  rpc CollectGreetings (stream HelloRequest) returns (HelloReply);
+
+  // Bidirectional Streaming: поток запросов <-> поток ответов
+  rpc ChatGreetings (stream HelloRequest) returns (stream HelloReply);
 }
 
 message HelloRequest {
