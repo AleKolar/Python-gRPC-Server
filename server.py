@@ -23,6 +23,7 @@ PORT = os.getenv("PORT")
 DEFAULT_COUNT = 3
 MAX_COUNT = 10
 MAX_NAME_LENGTH = 100
+MAX_STREAM_MESSAGES = 100
 
 
 class GreeterServicer(greeter_pb2_grpc.GreeterServicer):
@@ -114,6 +115,103 @@ class GreeterServicer(greeter_pb2_grpc.GreeterServicer):
             time.sleep(0.5)
 
         logging.info("WatchGreetings finished")
+
+    # Client Streaming: поток запросов -> один ответ
+    def CollectGreetings(self, request_iterator, context):
+
+        greetings = []
+
+        logging.info("CollectGreetings started")
+
+        for request in request_iterator:
+
+            # Ограничиваем размер входящего потока
+            if len(greetings) >= MAX_STREAM_MESSAGES:
+                context.abort(
+                    grpc.StatusCode.RESOURCE_EXHAUSTED,
+                    f"Maximum {MAX_STREAM_MESSAGES} messages allowed"
+                )
+
+            # Проверяем имя каждого входящего сообщения
+            name = self.validate_name(request.name, context)
+
+            # Формируем приветствие
+            greeting = self.build_greeting(name, request.tags)
+
+            greetings.append(greeting)
+
+            logging.info(
+                "CollectGreetings received: name=%s, tags=%s",
+                name,
+                list(request.tags)
+            )
+
+        # Формируем один итоговый ответ после завершения потока
+        if greetings:
+            message = (
+                    f"Received {len(greetings)} greetings: "
+                    + " | ".join(greetings)
+            )
+        else:
+            message = "Received 0 greetings"
+
+        logging.info(
+            "CollectGreetings finished: received=%s",
+            len(greetings)
+        )
+
+        return greeter_pb2.HelloReply(
+            message=message,
+            timestamp=int(time.time())
+        )
+
+
+    # Bidirectional Streaming: поток запросов <-> поток ответов
+    def ChatGreetings(self, request_iterator, context):
+
+        message_count = 0
+
+        logging.info("ChatGreetings started")
+
+        for request in request_iterator:
+
+            # Проверяем, не отключился ли клиент
+            if not context.is_active():
+                logging.info("ChatGreetings: client disconnected")
+                return
+
+            # Ограничиваем количество входящих сообщений
+            if message_count >= MAX_STREAM_MESSAGES:
+                context.abort(
+                    grpc.StatusCode.RESOURCE_EXHAUSTED,
+                    f"Maximum {MAX_STREAM_MESSAGES} messages allowed"
+                )
+
+            message_count += 1
+
+            # Валидируем входящие данные
+            name = self.validate_name(request.name, context)
+
+            # Формируем приветствие
+            greeting = self.build_greeting(name, request.tags)
+
+            logging.info(
+                "ChatGreetings message #%s: name=%s",
+                message_count,
+                name
+            )
+
+            # Отправляем ответ на каждое входящее сообщение
+            yield greeter_pb2.HelloReply(
+                message=f"Message {message_count}: {greeting}",
+                timestamp=int(time.time())
+            )
+
+        logging.info(
+            "ChatGreetings finished: messages=%s",
+            message_count
+        )
+
 
 
 def serve():
