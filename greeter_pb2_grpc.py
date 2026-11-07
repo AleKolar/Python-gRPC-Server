@@ -44,19 +44,45 @@ class GreeterStub:
                 request_serializer=greeter__pb2.HelloRequest.SerializeToString,
                 response_deserializer=greeter__pb2.HelloReply.FromString,
                 _registered_method=True)
+        self.CollectGreetings = channel.stream_unary(
+                '/bugdays.demo.Greeter/CollectGreetings',
+                request_serializer=greeter__pb2.HelloRequest.SerializeToString,
+                response_deserializer=greeter__pb2.HelloReply.FromString,
+                _registered_method=True)
+        self.ChatGreetings = channel.stream_stream(
+                '/bugdays.demo.Greeter/ChatGreetings',
+                request_serializer=greeter__pb2.HelloRequest.SerializeToString,
+                response_deserializer=greeter__pb2.HelloReply.FromString,
+                _registered_method=True)
 
 
 class GreeterServicer:
     """Missing associated documentation comment in .proto file."""
 
     def SayHello(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """Unary: один запрос -> один ответ
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def WatchGreetings(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """Server Streaming: один запрос -> поток ответов
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CollectGreetings(self, request_iterator, context):
+        """Client Streaming: поток запросов -> один ответ
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ChatGreetings(self, request_iterator, context):
+        """Bidirectional Streaming: поток запросов <-> поток ответов
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -71,6 +97,16 @@ def add_GreeterServicer_to_server(servicer, server):
             ),
             'WatchGreetings': grpc.unary_stream_rpc_method_handler(
                     servicer.WatchGreetings,
+                    request_deserializer=greeter__pb2.HelloRequest.FromString,
+                    response_serializer=greeter__pb2.HelloReply.SerializeToString,
+            ),
+            'CollectGreetings': grpc.stream_unary_rpc_method_handler(
+                    servicer.CollectGreetings,
+                    request_deserializer=greeter__pb2.HelloRequest.FromString,
+                    response_serializer=greeter__pb2.HelloReply.SerializeToString,
+            ),
+            'ChatGreetings': grpc.stream_stream_rpc_method_handler(
+                    servicer.ChatGreetings,
                     request_deserializer=greeter__pb2.HelloRequest.FromString,
                     response_serializer=greeter__pb2.HelloReply.SerializeToString,
             ),
@@ -127,6 +163,60 @@ class Greeter:
             request,
             target,
             '/bugdays.demo.Greeter/WatchGreetings',
+            greeter__pb2.HelloRequest.SerializeToString,
+            greeter__pb2.HelloReply.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def CollectGreetings(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_unary(
+            request_iterator,
+            target,
+            '/bugdays.demo.Greeter/CollectGreetings',
+            greeter__pb2.HelloRequest.SerializeToString,
+            greeter__pb2.HelloReply.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ChatGreetings(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_stream(
+            request_iterator,
+            target,
+            '/bugdays.demo.Greeter/ChatGreetings',
             greeter__pb2.HelloRequest.SerializeToString,
             greeter__pb2.HelloReply.FromString,
             options,

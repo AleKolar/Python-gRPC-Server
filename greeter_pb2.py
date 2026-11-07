@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rgreeter.proto\x12\x0c\x62ugdays.demo\"9\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x12\x0c\n\x04tags\x18\x03 \x03(\t\"0\n\nHelloReply\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x11\n\ttimestamp\x18\x02 \x01(\x03\x32\x95\x01\n\x07Greeter\x12@\n\x08SayHello\x12\x1a.bugdays.demo.HelloRequest\x1a\x18.bugdays.demo.HelloReply\x12H\n\x0eWatchGreetings\x12\x1a.bugdays.demo.HelloRequest\x1a\x18.bugdays.demo.HelloReply0\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rgreeter.proto\x12\x0c\x62ugdays.demo\"9\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x12\x0c\n\x04tags\x18\x03 \x03(\t\"0\n\nHelloReply\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x11\n\ttimestamp\x18\x02 \x01(\x03\x32\xac\x02\n\x07Greeter\x12@\n\x08SayHello\x12\x1a.bugdays.demo.HelloRequest\x1a\x18.bugdays.demo.HelloReply\x12H\n\x0eWatchGreetings\x12\x1a.bugdays.demo.HelloRequest\x1a\x18.bugdays.demo.HelloReply0\x01\x12J\n\x10\x43ollectGreetings\x12\x1a.bugdays.demo.HelloRequest\x1a\x18.bugdays.demo.HelloReply(\x01\x12I\n\rChatGreetings\x12\x1a.bugdays.demo.HelloRequest\x1a\x18.bugdays.demo.HelloReply(\x01\x30\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -36,5 +36,5 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_HELLOREPLY']._serialized_start=90
   _globals['_HELLOREPLY']._serialized_end=138
   _globals['_GREETER']._serialized_start=141
-  _globals['_GREETER']._serialized_end=290
+  _globals['_GREETER']._serialized_end=441
 # @@protoc_insertion_point(module_scope)
